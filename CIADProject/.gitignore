@@ -1,0 +1,82 @@
+# =========================
+# Build folders
+# =========================
+bin/
+obj/
+
+# =========================
+# Visual Studio
+# =========================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Environment / Secrets
+# =========================
+\SolutionItems\.env
+appsettings.json
+appsettings.*.json
+
+# Keep example configs if you add them later
+!appsettings.Development.example.json
+!appsettings.example.json
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Node modules (if frontend added later)
+# =========================
+node_modules/
+
+# =========================
+# Publish output
+# =========================
+publish/
+out/
+
+# =========================
+# EF Core local DB files
+# =========================
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/
+
+# =========================
+# JetBrains
+# =========================
+.idea/
+
+# =========================
+# Nginx cache/temp
+# =========================
+nginx/temp/
+nginx/cache/

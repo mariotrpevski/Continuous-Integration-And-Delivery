@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            padding: 40px 0;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 600px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        h2, h3 {
+            color: #333;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        #usersContainer {
+            margin-top: 20px;
+        }
+
+        .user-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            background-color: #f9f9f9;
+        }
+
+            .user-card p {
+                margin: 5px 0;
+            }
+
+            .user-card strong {
+                font-size: 16px;
+                color: #333;
+            }
+
+        #backButton {
+            margin-bottom: 20px;
+            background-color: #6c757d;
+        }
+
+            #backButton:hover {
+                background-color: #495057;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Dashboard</h2>
+
+        <button id="backButton" onclick="goBack()">Back</button>
+
+        <h3>Users</h3>
+        <div id="usersContainer"></div>
+    </div>
+
+    <script>
+        async function loadUsers() {
+            const response = await fetch("/admin/dashboard");
+
+            if (!response.ok) {
+                window.location.href = "/access-denied.html";
+                return;
+            }
+
+            const users = await response.json();
+            const container = document.getElementById("usersContainer");
+            container.innerHTML = "";
+
+            users.forEach(user => {
+                const div = document.createElement("div");
+                div.className = "user-card";
+
+                div.innerHTML = `
+                        <p><strong>${user.username}</strong></p>
+                        <p>Email: ${user.email}</p>
+                        <p>Role: ${user.role}</p>
+                        <p>Request Approved: ${user.requestsApproved}</p>
+                        <button onclick="approve('${user.username}')">Approve</button>
+                        <button onclick="deny('${user.username}')">Deny</button>
+                    `;
+
+                container.appendChild(div);
+            });
+        }
+
+        async function approve(username) {
+            const response = await fetch(`/admin/approve/${username}`, {
+                method: "POST"
+            });
+
+            const text = await response.text();
+            alert(text);
+            loadUsers();
+        }
+
+        async function deny(username) {
+            const response = await fetch(`/admin/deny/${username}`, {
+                method: "POST"
+            });
+
+            const text = await response.text();
+            alert(text);
+            loadUsers();
+        }
+
+        function goBack() {
+            window.location.href = "/welcome.html";
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>

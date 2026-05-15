@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 8px;
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+        #timer {
+            font-weight: bold;
+            margin-top: 15px;
+            color: #d9534f;
+        }
+
+        #message {
+            margin-top: 15px;
+            color: green;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="welcomeText"></h2>
+
+        <div id="adminSection" class="section" style="display:none;">
+            <p><a href="/admin-dashboard.html">Go to Admin Dashboard</a></p>
+        </div>
+
+        <div id="userSection" class="section" style="display:none;">
+            <button onclick="requestInfo()">Request Login Info</button>
+            <button onclick="downloadInfo()">Download Login Info</button>
+        </div>
+
+        <div id="adminDownloadSection" class="section" style="display:none;">
+            <button onclick="downloadInfo()">Download User Info</button>
+        </div>
+
+        <p id="timer"></p>
+
+        <button onclick="logout()">Logout</button>
+
+        <p id="message"></p>
+    </div>
+
+    <script>
+        async function loadUser() {
+            const response = await fetch("/me");
+
+            if (!response.ok) {
+                window.location.href = "/login.html";
+                return;
+            }
+
+            const user = await response.json();
+            document.getElementById("welcomeText").innerText =
+                `Welcome ${user.username}, your role is ${user.role}`;
+
+            if (user.role === "Admin") {
+                document.getElementById("adminSection").style.display = "block";
+                document.getElementById("adminDownloadSection").style.display = "block";
+            } else {
+                document.getElementById("userSection").style.display = "block";
+            }
+        }
+
+        let lastStatus = null;
+        let countdownInterval = null;
+
+        async function checkRequestStatus() {
+            const response = await fetch("/user/request-status");
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            if (lastStatus === null) lastStatus = data.status;
+
+            if (data.status !== lastStatus) {
+                alert(`Your request was ${data.status}`);
+                lastStatus = data.status;
+
+                if (data.status === "Approved") {
+                    startCountdown(data.remainingSeconds);
+                } else {
+                    stopCountdown();
+                    document.getElementById("timer").innerText = "";
+                }
+            }
+
+            if (data.status === "Approved" && countdownInterval) {
+                updateCountdown(data.remainingSeconds);
+            }
+        }
+
+        function startCountdown(seconds) {
+            let remaining = seconds;
+            document.getElementById("timer").innerText = `Time left to download: ${formatTime(remaining)}`;
+
+            countdownInterval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    document.getElementById("timer").innerText = "Download time expired";
+                    alert("Your 10-minute download window has expired");
+                } else {
+                    document.getElementById("timer").innerText = `Time left to download: ${formatTime(remaining)}`;
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        }
+
+        function updateCountdown(seconds) {
+            document.getElementById("timer").innerText = `Time left to download: ${formatTime(seconds)}`;
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+            const s = (seconds % 60).toString().padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        setInterval(checkRequestStatus, 5000);
+
+        async function requestInfo() {
+            const response = await fetch("/user/request-info", { method: "POST" });
+            const text = await response.text();
+            document.getElementById("message").innerText = text;
+        }
+
+        function downloadInfo() {
+            window.location.href = "/user/download-info";
+        }
+
+        async function logout() {
+            await fetch("/logout", { method: "POST" });
+            window.location.href = "/login.html";
+        }
+
+        loadUser();
+    </script>
+</body>
+</html>
