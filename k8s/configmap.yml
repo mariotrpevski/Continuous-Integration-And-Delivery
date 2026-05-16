@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ciadproject-config
+  namespace: ciadproject
+data:
+  POSTGRES_DB: ciadproject
+  POSTGRES_USER: postgres
+  SMTP_HOST: smtp.gmail.com
+  SMTP_PORT: "587"
+  SMTP_USER: tqctic.bro@gmail.com
+  SMTP_FROM: your_email@gmail.com

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ciadproject
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: mario576/ciadproject-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ciadproject-secrets
+                  key: postgres-password
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: ciadproject-secrets
+                  key: smtp-pass
+            - name: ConnectionStrings__DefaultConnection
+              value: "Host=postgres;Port=5432;Database=ciadproject;Username=postgres;Password=$(POSTGRES_PASSWORD)"
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: ciadproject-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: ciadproject-config
+                  key: POSTGRES_USER
+            - name: Smtp__Host
+              valueFrom:
+                configMapKeyRef:
+                  name: ciadproject-config
+                  key: SMTP_HOST
+            - name: Smtp__Port
+              valueFrom:
+                configMapKeyRef:
+                  name: ciadproject-config
+                  key: SMTP_PORT
+            - name: Smtp__User
+              valueFrom:
+                configMapKeyRef:
+                  name: ciadproject-config
+                  key: SMTP_USER
+            - name: Smtp__From
+              valueFrom:
+                configMapKeyRef:
+                  name: ciadproject-config
+                  key: SMTP_FROM
+            - name: Smtp__Pass
+              valueFrom:
+                secretKeyRef:
+                  name: ciadproject-secrets
+                  key: smtp-pass
