@@ -6,3 +6,13 @@
 /.vs/CIADProject.slnx
 /.vs/ProjectEvaluation
 /ci.yml
+/k8s/backend-deployment.yml
+/k8s/backend-service.yml
+/k8s/ingress.yml
+/k8s/configmap.yml
+/k8s/namespace.yml
+/k8s/nginx-deployment.yml
+/k8s/nginx-service.yml
+/k8s/postgres-service.yml
+/k8s/postgres-statefulset.yml
+/k8s/secrets.yml
