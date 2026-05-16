@@ -1,5 +1,6 @@
 services:
   nginx:
+    image: mario576/ciadproject-nginx:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,6 +10,7 @@ services:
       - backend
 
   backend:
+    image: mario576/ciadproject-backend:latest
     build:
       context: ./CIADProject
       dockerfile: Dockerfile
@@ -20,7 +22,7 @@ services:
       - Smtp__Pass=${SMTP_PASS}
       - Smtp__From=${SMTP_FROM}
     depends_on:
-      db:
+      db: 
         condition: service_healthy
 
   db:
