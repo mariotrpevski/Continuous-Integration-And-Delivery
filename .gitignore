@@ -5,3 +5,4 @@
 /.env
 /.vs/CIADProject.slnx
 /.vs/ProjectEvaluation
+/ci.yml
